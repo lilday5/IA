@@ -1,25 +1,28 @@
 import pygame
 import heapq
+import itertools
+import math
 
 # ==============================
 # CONFIGURACIÓN GENERAL
 # ==============================
-ROWS, COLS = 5, 5  # Cambia aquí: 7x7 o 20x20, se adapta automáticamente
-TILE_SIZE = 80     # Tamaño visual de cada cuadro
+ROWS, COLS = 21, 21   # Cambia aquí: 7x7 o 20x20, se adapta automáticamente
+TILE_SIZE = 40      # Tamaño visual de cada cuadro (px)
+BIAS = 1.001        # Sesgo suave para romper empates en f (hacia la meta)
 
 # Colores
 WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)
 GREEN = (0, 255, 0)
-RED = (255, 0, 0)
-BLUE = (0, 0, 255)
-GRAY = (200, 200, 200)
+RED   = (255, 0, 0)
+BLUE  = (0, 0, 255)
+GRAY  = (200, 200, 200)
 
 # Inicializa Pygame
 pygame.init()
 WIN = pygame.display.set_mode((COLS * TILE_SIZE, ROWS * TILE_SIZE))
 pygame.display.set_caption("Algoritmo A* (Manhattan con numeración dinámica)")
-FONT = pygame.font.SysFont("Arial", 14)
+FONT = pygame.font.SysFont("Arial", max(12, TILE_SIZE // 4))
 
 # ==============================
 # CLASE NODO
@@ -28,7 +31,7 @@ class Nodo:
     def __init__(self, fila, col, numero):
         self.fila = fila
         self.col = col
-        self.numero = numero  # Nuevo: número secuencial
+        self.numero = numero  # número secuencial
         self.g = float('inf')
         self.h = 0
         self.f = float('inf')
@@ -39,19 +42,28 @@ class Nodo:
         return self.f < otro.f
 
     def dibujar(self, color):
-        # Dibujar el cuadro
-        pygame.draw.rect(WIN, color, (self.col * TILE_SIZE, self.fila * TILE_SIZE, TILE_SIZE, TILE_SIZE))
-        pygame.draw.rect(WIN, BLACK, (self.col * TILE_SIZE, self.fila * TILE_SIZE, TILE_SIZE, TILE_SIZE), 1)
-
-        # Dibujar el número en la esquina superior derecha
+        # Celda
+        pygame.draw.rect(
+            WIN, color,
+            (self.col * TILE_SIZE, self.fila * TILE_SIZE, TILE_SIZE, TILE_SIZE)
+        )
+        # Borde
+        pygame.draw.rect(
+            WIN, BLACK,
+            (self.col * TILE_SIZE, self.fila * TILE_SIZE, TILE_SIZE, TILE_SIZE), 1
+        )
+        # Número (arriba-derecha)
         texto = FONT.render(str(self.numero), True, BLACK)
-        text_rect = texto.get_rect(topright=(self.col * TILE_SIZE + TILE_SIZE - 4, self.fila * TILE_SIZE + 2))
+        text_rect = texto.get_rect(
+            topright=(self.col * TILE_SIZE + TILE_SIZE - 4, self.fila * TILE_SIZE + 2)
+        )
         WIN.blit(texto, text_rect)
 
 # ==============================
 # FUNCIONES DEL ALGORITMO
 # ==============================
 def heuristica(nodo, objetivo):
+    # Distancia Manhattan (solo 4 direcciones)
     return 10 * (abs(nodo.fila - objetivo.fila) + abs(nodo.col - objetivo.col))
 
 def reconstruir_camino(nodo):
@@ -62,66 +74,92 @@ def reconstruir_camino(nodo):
     return camino[::-1]
 
 def a_estrella(grid, inicio, objetivo):
-    lista_abierta = []
-    lista_cerrada = set()
-    
+    # Reiniciar valores por seguridad
+    for fila in grid:
+        for n in fila:
+            n.g = float('inf')
+            n.h = 0
+            n.f = float('inf')
+            n.padre = None
+
+    # Inicialización
     inicio.g = 0
     inicio.h = heuristica(inicio, objetivo)
-    inicio.f = inicio.g + inicio.h
-    heapq.heappush(lista_abierta, (inicio.f, inicio))
+    inicio.f = inicio.g + inicio.h * BIAS  # tie-break hacia la meta
 
-    movimientos = [
-        (-1, 0, 10),  # Arriba
-        (1, 0, 10),   # Abajo
-        (0, -1, 10),  # Izquierda
-        (0, 1, 10)    # Derecha
-    ]
+    tick = itertools.count()
+    open_heap = []
+    heapq.heappush(open_heap, (inicio.f, inicio.h, next(tick), inicio))
+
+    open_set_nums = {inicio.numero}   # para mostrar LA
+    best_g = {inicio.numero: 0}       # mejor g conocido por nodo (por número)
+    closed_nums = set()               # LC para dibujar y mostrar
+
+    movimientos = [(-1,0), (1,0), (0,-1), (0,1)]  # U, D, L, R
 
     print("\n🧩 Iniciando búsqueda A* (Manhattan)")
     print(f"Punto inicial: {inicio.numero}")
     print(f"Punto final:   {objetivo.numero}\n")
 
-    while lista_abierta:
-        actual_f, actual = heapq.heappop(lista_abierta)
-        lista_cerrada.add(actual.numero)
+    while open_heap:
+        _, _, _, actual = heapq.heappop(open_heap)
 
-        print(f"➡️ Explorando nodo: {actual.numero}  f={actual.f} g={actual.g} h={actual.h}")
+        # Saltar entradas obsoletas o ya cerradas
+        if actual.numero in closed_nums:
+            continue
+        if best_g.get(actual.numero, math.inf) < actual.g:
+            continue
 
-        print("📘 LA (Lista Abierta):", [n.numero for _, n in lista_abierta])
-        print("📕 LC (Lista Cerrada):", lista_cerrada)
+        # Mover de LA a LC
+        open_set_nums.discard(actual.numero)
+        closed_nums.add(actual.numero)
+
+        print(f"➡️ Explorando nodo: {actual.numero}  f={actual.f:.1f} g={actual.g:.1f} h={actual.h:.1f}")
+        print("📘 LA (Abierta):", sorted(open_set_nums))
+        print("📕 LC (Cerrada):", sorted(closed_nums))
         print("-" * 60)
 
-        pygame.time.delay(30)
-        actual.dibujar(GRAY)
-        pygame.display.update()
+        # Animación ligera
+        pygame.time.delay(15)
+        if actual not in (inicio, objetivo):
+            actual.dibujar(GRAY)
+            pygame.display.update()
 
-        if actual == objetivo:
+        # ¿Llegamos?
+        if actual is objetivo:
             print("\n✅ ¡Objetivo alcanzado!\n")
             camino_final = reconstruir_camino(actual)
             print("🟩 Camino final:")
             print(" -> ".join(str(n.numero) for n in camino_final), "-> FIN\n")
-            return camino_final, lista_cerrada
+            return camino_final, closed_nums
 
-        for dx, dy, costo_mov in movimientos:
-            fila_nueva, col_nueva = actual.fila + dx, actual.col + dy
-            if not (0 <= fila_nueva < ROWS and 0 <= col_nueva < COLS):
+        # ---- Orden de vecinos: prioriza los más cercanos al objetivo (menor h) ----
+        vecinos = []
+        for dx, dy in movimientos:
+            fr, fc = actual.fila + dx, actual.col + dy
+            if 0 <= fr < ROWS and 0 <= fc < COLS:
+                vecinos.append(grid[fr][fc])
+        vecinos.sort(key=lambda v: abs(v.fila - objetivo.fila) + abs(v.col - objetivo.col))
+
+        # Explorar vecinos
+        for vecino in vecinos:
+            if vecino.es_obstaculo or vecino.numero in closed_nums:
                 continue
 
-            vecino = grid[fila_nueva][col_nueva]
-            if vecino.es_obstaculo or vecino.numero in lista_cerrada:
-                continue
-
-            nuevo_g = actual.g + costo_mov
-            if nuevo_g < vecino.g:
+            nuevo_g = actual.g + 10  # costo ortogonal
+            if nuevo_g < best_g.get(vecino.numero, math.inf):
                 vecino.g = nuevo_g
                 vecino.h = heuristica(vecino, objetivo)
-                vecino.f = vecino.g + vecino.h
+                vecino.f = vecino.g + vecino.h * BIAS   # tie-break
                 vecino.padre = actual
-                if all(n != vecino for _, n in lista_abierta):
-                    heapq.heappush(lista_abierta, (vecino.f, vecino))
+                best_g[vecino.numero] = nuevo_g
+
+                # Insertar en abierta (aunque haya otra entrada peor en heap)
+                heapq.heappush(open_heap, (vecino.f, vecino.h, next(tick), vecino))
+                open_set_nums.add(vecino.numero)
 
     print("\n❌ No se encontró un camino posible.\n")
-    return [], lista_cerrada
+    return [], closed_nums
 
 # ==============================
 # GENERAR LA CUADRÍCULA
@@ -161,7 +199,7 @@ while corriendo:
                 nodo.dibujar(GRAY)
             else:
                 nodo.dibujar(WHITE)
-    
+
     if inicio:
         inicio.dibujar(BLUE)
     if objetivo:
@@ -182,7 +220,7 @@ while corriendo:
                 if (fila, col) != (inicio.fila, inicio.col):
                     objetivo = grid[fila][col]
                     fase = 2
-            elif fase == 2:  # Dibujar obstáculos
+            elif fase == 2:  # Dibujar/ borrar obstáculos con arrastre
                 nodo = grid[fila][col]
                 if nodo not in [inicio, objetivo]:
                     modo_pintar = not nodo.es_obstaculo
@@ -202,12 +240,8 @@ while corriendo:
 
         elif evento.type == pygame.KEYDOWN:
             if evento.key == pygame.K_SPACE and fase == 2:
+                # Ejecutar A*
                 fase = 3
-                for fila in grid:
-                    for nodo in fila:
-                        nodo.g = float('inf')
-                        nodo.f = float('inf')
-                        nodo.padre = None
                 camino, lista_cerrada = a_estrella(grid, inicio, objetivo)
 
     pygame.display.update()
