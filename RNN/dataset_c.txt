@@ -1,0 +1,333 @@
+#include <stdio.h>
+#include <string.h>
+
+int sumar(int a, int b){
+return a + b;
+}
+
+int restar(int a, int b){
+return a - b;
+}
+
+int multiplicar(int a, int b){
+return a * b;
+}
+
+int dividirEntero(int a, int b){
+if(b == 0){
+return 0;
+}
+return a / b;
+}
+
+int modulo(int a, int b){
+if(b == 0){
+return 0;
+}
+return a % b;
+}
+
+int cuadrado(int numero){
+return numero * numero;
+}
+
+int cubo(int numero){
+return numero * numero * numero;
+}
+
+int valorAbsoluto(int numero){
+if(numero < 0){
+return -numero;
+}
+return numero;
+}
+
+int maximo(int a, int b){
+if(a > b){
+return a;
+}
+return b;
+}
+
+int minimo(int a, int b){
+if(a < b){
+return a;
+}
+return b;
+}
+
+int esPar(int numero){
+return numero % 2 == 0;
+}
+
+int esImpar(int numero){
+return numero % 2 != 0;
+}
+
+int potenciaDos(int numero){
+return numero * 2;
+}
+
+int potenciaTres(int numero){
+return numero * 3;
+}
+
+int promedioDos(int a, int b){
+return (a + b) / 2;
+}
+
+int areaCuadrado(int lado){
+return lado * lado;
+}
+
+int perimetroCuadrado(int lado){
+return lado * 4;
+}
+
+int areaRectangulo(int base, int altura){
+return base * altura;
+}
+
+int perimetroRectangulo(int base, int altura){
+return (base + altura) * 2;
+}
+
+int areaTriangulo(int base, int altura){
+return (base * altura) / 2;
+}
+
+int factorial(int n){
+if(n <= 1){
+return 1;
+}
+return n * factorial(n - 1);
+}
+
+int fibonacci(int n){
+if(n <= 1){
+return n;
+}
+return fibonacci(n - 1) + fibonacci(n - 2);
+}
+
+int sumaArreglo(int arreglo[], int n){
+int suma = 0;
+int i;
+for(i = 0; i < n; i++){
+suma += arreglo[i];
+}
+return suma;
+}
+
+int maximoArreglo(int arreglo[], int n){
+int i;
+int mayor = arreglo[0];
+for(i = 1; i < n; i++){
+if(arreglo[i] > mayor){
+mayor = arreglo[i];
+}
+}
+return mayor;
+}
+
+int minimoArreglo(int arreglo[], int n){
+int i;
+int menor = arreglo[0];
+for(i = 1; i < n; i++){
+if(arreglo[i] < menor){
+menor = arreglo[i];
+}
+}
+return menor;
+}
+
+int buscarElemento(int arreglo[], int n, int valor){
+int i;
+for(i = 0; i < n; i++){
+if(arreglo[i] == valor){
+return i;
+}
+}
+return -1;
+}
+
+int contarMayores(int arreglo[], int n, int valor){
+int i;
+int contador = 0;
+for(i = 0; i < n; i++){
+if(arreglo[i] > valor){
+contador++;
+}
+}
+return contador;
+}
+
+int contarMenores(int arreglo[], int n, int valor){
+int i;
+int contador = 0;
+for(i = 0; i < n; i++){
+if(arreglo[i] < valor){
+contador++;
+}
+}
+return contador;
+}
+
+int primerElemento(int arreglo[]){
+return arreglo[0];
+}
+
+int ultimoElemento(int arreglo[], int n){
+return arreglo[n - 1];
+}
+
+int longitudCadena(char texto[]){
+return strlen(texto);
+}
+
+int cadenaVacia(char texto[]){
+return strlen(texto) == 0;
+}
+
+int primerCaracter(char texto[]){
+return texto[0];
+}
+
+int ultimoCaracter(char texto[]){
+return texto[strlen(texto) - 1];
+}
+
+int contarCaracter(char texto[], char letra){
+int i;
+int contador = 0;
+for(i = 0; texto[i] != '\0'; i++){
+if(texto[i] == letra){
+contador++;
+}
+}
+return contador;
+}
+
+int contieneCaracter(char texto[], char letra){
+int i;
+for(i = 0; texto[i] != '\0'; i++){
+if(texto[i] == letra){
+return 1;
+}
+}
+return 0;
+}
+
+int sumaUno(int numero){
+return numero + 1;
+}
+
+int restaUno(int numero){
+return numero - 1;
+}
+
+int dobleNumero(int numero){
+return numero * 2;
+}
+
+int tripleNumero(int numero){
+return numero * 3;
+}
+
+int mitadNumero(int numero){
+return numero / 2;
+}
+
+int porcentajeDiez(int numero){
+return numero * 10 / 100;
+}
+
+int porcentajeVeinte(int numero){
+return numero * 20 / 100;
+}
+
+int porcentajeCincuenta(int numero){
+return numero * 50 / 100;
+}
+
+int convertirMinutosSegundos(int minutos){
+return minutos * 60;
+}
+
+int convertirHorasMinutos(int horas){
+return horas * 60;
+}
+
+int convertirDiasHoras(int dias){
+return dias * 24;
+}
+
+int sumaTres(int a, int b, int c){
+return a + b + c;
+}
+
+int productoTres(int a, int b, int c){
+return a * b * c;
+}
+
+int promedioTres(int a, int b, int c){
+return (a + b + c) / 3;
+}
+
+int mayorTres(int a, int b, int c){
+int mayor = a;
+if(b > mayor){
+mayor = b;
+}
+if(c > mayor){
+mayor = c;
+}
+return mayor;
+}
+
+int menorTres(int a, int b, int c){
+int menor = a;
+if(b < menor){
+menor = b;
+}
+if(c < menor){
+menor = c;
+}
+return menor;
+}
+
+int esPositivo(int numero){
+return numero > 0;
+}
+
+int esNegativo(int numero){
+return numero < 0;
+}
+
+int esCero(int numero){
+return numero == 0;
+}
+
+int multiplicarDiez(int numero){
+return numero * 10;
+}
+
+int dividirDiez(int numero){
+return numero / 10;
+}
+
+int areaTrapecio(int baseMayor, int baseMenor, int altura){
+return ((baseMayor + baseMenor) * altura) / 2;
+}
+
+int perimetroTriangulo(int a, int b, int c){
+return a + b + c;
+}
+
+int sumaCuadrados(int a, int b){
+return (a * a) + (b * b);
+}
+
+int diferenciaCuadrados(int a, int b){
+return (a * a) - (b * b);
+}

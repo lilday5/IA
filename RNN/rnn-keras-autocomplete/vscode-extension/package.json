@@ -1,0 +1,37 @@
+{
+  "name": "rnn-keras-autocomplete",
+  "displayName": "RNN Keras Autocomplete",
+  "version": "0.1.0",
+  "engines": { "vscode": "^1.80.0" },
+  "main": "./extension.js",
+  "activationEvents": ["*"],
+  "contributes": {
+    "commands": [
+      { "command": "rnnKeras.complete", "title": "RNN: completar línea" },
+      { "command": "rnnKeras.suggest", "title": "RNN: elegir sugerencia" }
+    ],
+    "keybindings": [
+      {
+        "command": "rnnKeras.complete",
+        "key": "ctrl+shift+space",
+        "when": "editorTextFocus"
+      },
+      {
+        "command": "rnnKeras.suggest",
+        "key": "ctrl+space",
+        "when": "editorTextFocus"
+      }
+    ],
+    "configuration": {
+      "properties": {
+        "rnnKeras.pythonPath": { "type": "string", "default": "python3" },
+        "rnnKeras.serverScript": {
+          "type": "string",
+          "default": "",
+          "description": "Ruta absoluta a server_stdio.py"
+        },
+        "rnnKeras.maxNew": { "type": "number", "default": 60 }
+      }
+    }
+  }
+}
