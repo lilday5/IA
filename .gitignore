@@ -1,0 +1,22 @@
+# Entornos virtuales
+venv/
+.venv/
+env/
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.egg-info/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Modelos grandes (opcional, comenta si los quieres subir)
+*.h5
+*.keras
+*.dylib
+*.so
+
+# macOS
+.DS_Store
